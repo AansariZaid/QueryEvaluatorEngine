@@ -7,10 +7,10 @@ public class QueryProcessor {
 
 	Map<Integer, ArrayList<String>> dataSet;
 
-	public Map<Integer, ArrayList<String>> ProcessQuery(QueryParameter queryParameter, CSVFileReader csvFileReader) {
+	public Map<Integer, ArrayList<String>> processQuery(QueryParameter queryParameter, CSVFileReader csvFileReader) {
 
 		String tableName = queryParameter.getTableName();
-		String groupByColumn = queryParameter.getGroupByColumns();
+		String groupByColumn = queryParameter.getGroupByColumn();
 		String orderByColumn = queryParameter.getOrderByColumn();
 		int orderByIndexInMap = queryParameter.getOrderByIndexInMap();
 		String[] selectedColumnNames = queryParameter.getSelectColumnNames();

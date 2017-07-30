@@ -12,9 +12,12 @@ public class QueryParameter {
 	private ArrayList<Criteria> whereClause = null;
 	private ArrayList<String> logicalConditions = null;
 	private String sumFunction = null;
-	private String groupByColumns = null; // custom class with agg function name
+	private String groupByColumn = null; // custom class with agg function name
 	private String countFunction = null;
 	private String orderByColumn = null;
+	
+	private ArrayList<AggregateFunctions> aggregateFunctions = null;
+	
 	private Pattern pattern;
 	private Matcher matcher;
 
@@ -22,7 +25,7 @@ public class QueryParameter {
 	int getGroupByIndexInMap() {
 		int index = 0;
 		for (int i = 0; i < selectColumnNames.length; i++) {
-			if (selectColumnNames[i].equalsIgnoreCase(groupByColumns))
+			if (selectColumnNames[i].equalsIgnoreCase(groupByColumn))
 				index = i;
 		}
 		return index;
@@ -38,6 +41,12 @@ public class QueryParameter {
 		return index;
 	}
 	
+	/* method to create Aggregate Function */
+	private void createAggregateFunction(String aggregate)
+	{
+		AggregateFunctions function = new AggregateFunctions();
+		
+	}
 	// sal > 1000
 	private void createCriteria(String clauseString) {
 		Criteria criteria = new Criteria();
@@ -60,12 +69,12 @@ public class QueryParameter {
 
 		// select * from tableName
 
-		String[] SplitAtFrom = query.split("from");
+		String[] splitAtFrom = query.split("from");
 		pattern = Pattern.compile("select (.*?) from (.*)+?");
 		matcher = pattern.matcher(query.trim());
 		if (matcher.find()) {
 			if (matcher.group(1).trim().contains("sum")) {
-				pattern = Pattern.compile("(\\(([a-zA-Z\\*]+)\\))");
+				pattern = Pattern.compile("(\\(([\\w\\*]+)\\))");
 				matcher = pattern.matcher(matcher.group(1));
 				if (matcher.find()) {
 					sumFunction = matcher.group(2);
@@ -73,14 +82,14 @@ public class QueryParameter {
 			}
 			// count(abcd) ---> abcd
 			if (matcher.group(1).trim().contains("count")) {
-				pattern = Pattern.compile("(\\(([a-zA-Z\\*]+)\\))");
+				pattern = Pattern.compile("(\\(([\\w\\*]+)\\))");
 				matcher = pattern.matcher(matcher.group(1));
 				if (matcher.find()) {
 					countFunction = matcher.group(2);
 				}
 			}
 			selectColumnNames = matcher.group(1).split("[\\s,]+");
-			String[] tableName = SplitAtFrom[1].split("[\\s.]+");
+			String[] tableName = splitAtFrom[1].split("[\\s.]+");
 			this.tableName = tableName[1];
 		}
 		String[] splitAtOrderBy = query.split("order by");
@@ -92,7 +101,7 @@ public class QueryParameter {
 		splitAtGroupBy = splitAtOrderBy[0].split("group by");
 
 		if (splitAtGroupBy.length > 1) {
-			groupByColumns = splitAtGroupBy[1].trim();
+			groupByColumn = splitAtGroupBy[1].trim();
 		}
 
 		splitAtWhere = splitAtGroupBy[0].split("where");
@@ -100,18 +109,18 @@ public class QueryParameter {
 		// sal > 1000 and name = abcd or col = something
 
 		if (splitAtWhere.length > 1) {
-			whereClause = new ArrayList();
-			logicalConditions = new ArrayList();
+			whereClause = new ArrayList<>();
+			logicalConditions = new ArrayList<>();
 			String whereString = splitAtWhere[1].trim();
-			String[] whereCond = whereString.split("\\s+");
-			for (String s : whereCond) {
+			String[] logicalCond = whereString.split("\\s+");
+			for (String s : logicalCond) {
 				if (s.equals("and")) {
 					logicalConditions.add("and");
 				} else if (s.equals("or")) {
 					logicalConditions.add("or");
 				}
 			}
-			String[] whereClauseElement = whereString.split(" and | or ", 2); // \\s+
+			String[] whereClauseElement = whereString.split(" and | or ", 2); // extra spaces are handled by trim
 			while (whereClauseElement.length != 1) {
 				createCriteria(whereClauseElement[0].trim());
 				whereClauseElement = whereClauseElement[1].split(" and | or ", 2);
@@ -134,8 +143,8 @@ public class QueryParameter {
 		return whereClause;
 	}
 
-	public String getGroupByColumns() {
-		return groupByColumns;
+	public String getGroupByColumn() {
+		return groupByColumn;
 	}
 
 	public String getSumFunction() {
@@ -150,8 +159,8 @@ public class QueryParameter {
 		return
 
 		"QueryParameter [selectColumnNames=" + Arrays.toString(selectColumnNames) + ", tableName=" + tableName
-				+ ", whereClause=" + whereClause + ", logicalConditions=" + logicalConditions + ", groupByColumns="
-				+ groupByColumns + ", orderByColumn=" + orderByColumn + ", sumFunction=" + sumFunction
+				+ ", whereClause=" + whereClause + ", logicalConditions=" + logicalConditions + ", groupByColumn="
+				+ groupByColumn + ", orderByColumn=" + orderByColumn + ", sumFunction=" + sumFunction
 				+ ", countFunction=" + countFunction + "]";
 	}
 

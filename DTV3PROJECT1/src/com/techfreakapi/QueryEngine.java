@@ -13,7 +13,7 @@ public class QueryEngine {
 	public Map<Integer,ArrayList<String>> executeQuery(String query)
 	{
 		queryParameter = queryParameter.extractParameter(query);
-		dataSet = queryProcessor.ProcessQuery(queryParameter, csvFileReader); //p error
+		dataSet = queryProcessor.processQuery(queryParameter, csvFileReader);
 		return dataSet;
 	}
 }
