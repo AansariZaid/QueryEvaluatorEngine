@@ -1,4 +1,4 @@
-package com.techfreakapi;
+package com.stackroute.queryengine;
 
 public class Criteria {
 	

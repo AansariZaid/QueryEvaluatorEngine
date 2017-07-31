@@ -1,4 +1,4 @@
-package com.techfreakapi;
+package com.stackroute.queryengine;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -13,7 +13,11 @@ public class QueryEngine {
 	public Map<Integer,ArrayList<String>> executeQuery(String query)
 	{
 		queryParameter = queryParameter.extractParameter(query);
-		dataSet = queryProcessor.processQuery(queryParameter, csvFileReader);
+		
+		System.out.println(queryParameter);
+		
+		//dataSet = queryProcessor.processQuery(queryParameter, csvFileReader);
+		
 		return dataSet;
 	}
 }

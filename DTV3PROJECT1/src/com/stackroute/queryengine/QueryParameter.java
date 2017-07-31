@@ -1,4 +1,4 @@
-package com.techfreakapi;
+package com.stackroute.queryengine;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,13 +11,12 @@ public class QueryParameter {
 	private String tableName = null;
 	private ArrayList<Criteria> whereClause = null;
 	private ArrayList<String> logicalConditions = null;
-	private String sumFunction = null;
-	private String groupByColumn = null; // custom class with agg function name
-	private String countFunction = null;
+	private String groupByColumn = null;
 	private String orderByColumn = null;
-	
-	private ArrayList<AggregateFunctions> aggregateFunctions = null;
-	
+	private String queryType = null;
+
+	private ArrayList<AggregateFunctions> aggregateFunctions = new ArrayList<>();
+
 	private Pattern pattern;
 	private Matcher matcher;
 
@@ -30,7 +29,7 @@ public class QueryParameter {
 		}
 		return index;
 	}
-	
+
 	// METHOD TO OBTAIN ORDER BY INDEX IN MAP
 	int getOrderByIndexInMap() {
 		int index = 0;
@@ -40,13 +39,7 @@ public class QueryParameter {
 		}
 		return index;
 	}
-	
-	/* method to create Aggregate Function */
-	private void createAggregateFunction(String aggregate)
-	{
-		AggregateFunctions function = new AggregateFunctions();
-		
-	}
+
 	// sal > 1000
 	private void createCriteria(String clauseString) {
 		Criteria criteria = new Criteria();
@@ -60,6 +53,20 @@ public class QueryParameter {
 		whereClause.add(criteria);
 	}
 
+	/* method to create Aggregate Function */
+	private void createAggregateFunction(String aggregate, String functions) {
+		AggregateFunctions someFunction = new AggregateFunctions();
+		pattern = Pattern.compile("(\\(([\\w\\*]+)\\))");
+		matcher = pattern.matcher(aggregate);
+		if (matcher.find()) {
+			someFunction.setColumName(matcher.group(2));
+			someFunction.setFunctionName(functions);
+		}
+		aggregateFunctions.add(someFunction);
+	}
+
+	// *********METHOD TO EXTRACT ALL PRAMETERS FROM GIVEN QUERY***//
+
 	public QueryParameter extractParameter(String query) {
 
 		query = query.toLowerCase();
@@ -70,28 +77,38 @@ public class QueryParameter {
 		// select * from tableName
 
 		String[] splitAtFrom = query.split("from");
+		// extracting column names
+
+		String[] columns = splitAtFrom[0].split("\\s+|\\,");
+
+		// extracting aggregate functions
+		for (int i = 1; i < columns.length; i++) {
+			if (columns[i].trim().contains("sum")) {
+				createAggregateFunction(columns[i].trim().trim(), "sum");
+			}
+			// count(abcd) ---> abcd
+			if (columns[i].trim().trim().contains("count")) {
+				createAggregateFunction(columns[i].trim().trim(), "count");
+			}
+			if (columns[i].trim().trim().contains("min")) {
+				createAggregateFunction(columns[i].trim().trim(), "min");
+			}
+			if (columns[i].trim().trim().contains("max")) {
+				createAggregateFunction(columns[i].trim().trim(), "max");
+			}
+			if (columns[i].trim().trim().contains("avg")) {
+				createAggregateFunction(columns[i].trim().trim(), "avg");
+			}
+		}
+		// extracting columns without aggregate Functions
 		pattern = Pattern.compile("select (.*?) from (.*)+?");
 		matcher = pattern.matcher(query.trim());
 		if (matcher.find()) {
-			if (matcher.group(1).trim().contains("sum")) {
-				pattern = Pattern.compile("(\\(([\\w\\*]+)\\))");
-				matcher = pattern.matcher(matcher.group(1));
-				if (matcher.find()) {
-					sumFunction = matcher.group(2);
-				}
-			}
-			// count(abcd) ---> abcd
-			if (matcher.group(1).trim().contains("count")) {
-				pattern = Pattern.compile("(\\(([\\w\\*]+)\\))");
-				matcher = pattern.matcher(matcher.group(1));
-				if (matcher.find()) {
-					countFunction = matcher.group(2);
-				}
-			}
 			selectColumnNames = matcher.group(1).split("[\\s,]+");
 			String[] tableName = splitAtFrom[1].split("[\\s.]+");
 			this.tableName = tableName[1];
 		}
+
 		String[] splitAtOrderBy = query.split("order by");
 
 		if (splitAtOrderBy.length > 1) {
@@ -147,23 +164,6 @@ public class QueryParameter {
 		return groupByColumn;
 	}
 
-	public String getSumFunction() {
-		return sumFunction;
-	}
-
-	public String getCountFunction() {
-		return countFunction;
-	}
-
-	public String toString() {
-		return
-
-		"QueryParameter [selectColumnNames=" + Arrays.toString(selectColumnNames) + ", tableName=" + tableName
-				+ ", whereClause=" + whereClause + ", logicalConditions=" + logicalConditions + ", groupByColumn="
-				+ groupByColumn + ", orderByColumn=" + orderByColumn + ", sumFunction=" + sumFunction
-				+ ", countFunction=" + countFunction + "]";
-	}
-
 	public ArrayList<String> getlogicalConditions() {
 		return logicalConditions;
 	}
@@ -171,4 +171,13 @@ public class QueryParameter {
 	public String getOrderByColumn() {
 		return orderByColumn;
 	}
+
+	@Override
+	public String toString() {
+		return "QueryParameter [selectColumnNames=" + Arrays.toString(selectColumnNames) + ", tableName=" + tableName
+				+ ", whereClause=" + whereClause + ", logicalConditions=" + logicalConditions + ", groupByColumn="
+				+ groupByColumn + ", orderByColumn=" + orderByColumn + ", queryType=" + queryType
+				+ ", aggregateFunctions=" + aggregateFunctions + "]";
+	}
+
 }

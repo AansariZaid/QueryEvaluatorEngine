@@ -1,13 +1,10 @@
-package com.techfreakapi;
+package com.stackroute.queryengine;
 
 public class AggregateFunctions {
 
 	String functionName;
 	String columName;
-	int Position;
 	String value;
-	
-	
 	
 	public String getFunctionName() {
 		return functionName;
@@ -15,9 +12,7 @@ public class AggregateFunctions {
 	public String getColumName() {
 		return columName;
 	}
-	public int getPosition() {
-		return Position;
-	}
+	
 	public String getValue() {
 		return value;
 	}
@@ -27,11 +22,12 @@ public class AggregateFunctions {
 	public void setColumName(String columName) {
 		this.columName = columName;
 	}
-	public void setPosition(int position) {
-		Position = position;
-	}
+	
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
+	@Override
+	public String toString() {
+		return "AggregateFunctions [functionName=" + functionName + ", columName=" + columName  + ", value=" + value + "]";
+	}
 }
