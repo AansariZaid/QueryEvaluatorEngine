@@ -21,7 +21,7 @@ public class QueryParameter {
 	private Matcher matcher;
 
 	// METHOD TO OBTAIN GROUP BY INDEX IN MAP
-	int getGroupByIndexInMap() {
+	public int getGroupByIndexInMap() {
 		int index = 0;
 		for (int i = 0; i < selectColumnNames.length; i++) {
 			if (selectColumnNames[i].equalsIgnoreCase(groupByColumn))
@@ -88,7 +88,7 @@ public class QueryParameter {
 			orderByColumn = splitAtOrderBy[1].trim();
 			queryType = "ORDER_BY_QUERY";
 		}
-		
+
 		splitAtWhere = splitAtGroupBy[0].split("where");
 
 		// sal > 1000 and name = abcd or col = something
@@ -122,20 +122,20 @@ public class QueryParameter {
 		// extracting aggregate functions
 		for (int i = 1; i < columns.length; i++) {
 			if (columns[i].trim().contains("sum")) {
-				createAggregateFunction(columns[i].trim().trim(), "sum");
+				createAggregateFunction(columns[i].trim(), "sum");
 			}
 			// count(abcd) ---> abcd
 			if (columns[i].trim().trim().contains("count")) {
-				createAggregateFunction(columns[i].trim().trim(), "count");
+				createAggregateFunction(columns[i].trim(), "count");
 			}
 			if (columns[i].trim().trim().contains("min")) {
-				createAggregateFunction(columns[i].trim().trim(), "min");
+				createAggregateFunction(columns[i].trim(), "min");
 			}
 			if (columns[i].trim().trim().contains("max")) {
-				createAggregateFunction(columns[i].trim().trim(), "max");
+				createAggregateFunction(columns[i].trim(), "max");
 			}
 			if (columns[i].trim().trim().contains("avg")) {
-				createAggregateFunction(columns[i].trim().trim(), "avg");
+				createAggregateFunction(columns[i].trim(), "avg");
 			}
 		}
 		// extracting columns without aggregate Functions
@@ -180,6 +180,14 @@ public class QueryParameter {
 				+ ", whereClause=" + whereClause + ", logicalConditions=" + logicalConditions + ", groupByColumn="
 				+ groupByColumn + ", orderByColumn=" + orderByColumn + ", queryType=" + queryType
 				+ ", aggregateFunctions=" + aggregateFunctions + "]";
+	}
+
+	public String getQueryType() {
+		return queryType;
+	}
+
+	public void setQueryType(String queryType) {
+		this.queryType = queryType;
 	}
 
 }

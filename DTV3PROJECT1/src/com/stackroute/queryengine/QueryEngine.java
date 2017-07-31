@@ -8,7 +8,7 @@ public class QueryEngine {
 	private QueryParameter queryParameter = new QueryParameter();
 	private Map<Integer, ArrayList<String>> dataSet;
 	private QueryProcessor queryProcessor = new QueryProcessor();
-	private CSVFileReader csvFileReader = new CSVFileReader();
+//	private CSVFileReader csvFileReader = new CSVFileReader();
 	
 	public Map<Integer,ArrayList<String>> executeQuery(String query)
 	{
@@ -16,7 +16,7 @@ public class QueryEngine {
 		
 		System.out.println(queryParameter);
 		
-		//dataSet = queryProcessor.processQuery(queryParameter, csvFileReader);
+		dataSet = queryProcessor.processQuery(queryParameter);
 		
 		return dataSet;
 	}

@@ -1,5 +1,6 @@
 package com.stackroute.queryengine.processors;
 
-public class GroupByProcessor implements Processor {
+public class GroupByProcessor {
 
+	//group by with aggregate Functions only
 }

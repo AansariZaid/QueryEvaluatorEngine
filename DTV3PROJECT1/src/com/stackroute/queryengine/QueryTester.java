@@ -16,13 +16,13 @@ public class QueryTester {
 		query = sc.nextLine();
 
 		dataSet = queryEngine.executeQuery(query);
-		/*for (Map.Entry<Integer, ArrayList<String>> m : dataSet.entrySet()) {
+		for (Map.Entry<Integer, ArrayList<String>> m : dataSet.entrySet()) {
 			ArrayList<String> data = m.getValue();
 			for (String s : data) {
 				System.out.print(s + "\t");
 			}
 			System.out.println();
-		}*/
+		}
 	}
 
 }
