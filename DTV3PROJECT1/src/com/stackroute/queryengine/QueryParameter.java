@@ -13,7 +13,7 @@ public class QueryParameter {
 	private ArrayList<String> logicalConditions = null;
 	private String groupByColumn = null;
 	private String orderByColumn = null;
-	private String queryType = null;
+	private String queryType = "SIMPLE_QUERY";
 
 	private ArrayList<AggregateFunctions> aggregateFunctions = new ArrayList<>();
 
@@ -55,6 +55,7 @@ public class QueryParameter {
 
 	/* method to create Aggregate Function */
 	private void createAggregateFunction(String aggregate, String functions) {
+		queryType = "AGGREGATE_QUERY";
 		AggregateFunctions someFunction = new AggregateFunctions();
 		pattern = Pattern.compile("(\\(([\\w\\*]+)\\))");
 		matcher = pattern.matcher(aggregate);
@@ -74,6 +75,43 @@ public class QueryParameter {
 		String[] splitAtGroupBy = null;
 		String[] splitAtWhere = null;
 
+		String[] splitAtOrderBy = query.split("order by");
+
+		splitAtGroupBy = splitAtOrderBy[0].split("group by");
+
+		if (splitAtGroupBy.length > 1) {
+			groupByColumn = splitAtGroupBy[1].trim();
+			queryType = "GROUP_BY_QUERY";
+		}
+
+		if (splitAtOrderBy.length > 1) {
+			orderByColumn = splitAtOrderBy[1].trim();
+			queryType = "ORDER_BY_QUERY";
+		}
+		
+		splitAtWhere = splitAtGroupBy[0].split("where");
+
+		// sal > 1000 and name = abcd or col = something
+
+		if (splitAtWhere.length > 1) {
+			whereClause = new ArrayList<>();
+			logicalConditions = new ArrayList<>();
+			String whereString = splitAtWhere[1].trim();
+			String[] logicalCond = whereString.split("\\s+");
+			for (String s : logicalCond) {
+				if (s.equals("and")) {
+					logicalConditions.add("and");
+				} else if (s.equals("or")) {
+					logicalConditions.add("or");
+				}
+			}
+			String[] whereClauseElement = whereString.split(" and | or ", 2); // extra spaces are handled by trim
+			while (whereClauseElement.length != 1) {
+				createCriteria(whereClauseElement[0].trim());
+				whereClauseElement = whereClauseElement[1].split(" and | or ", 2);
+			}
+			createCriteria(whereClauseElement[0].trim());
+		}
 		// select * from tableName
 
 		String[] splitAtFrom = query.split("from");
@@ -107,42 +145,6 @@ public class QueryParameter {
 			selectColumnNames = matcher.group(1).split("[\\s,]+");
 			String[] tableName = splitAtFrom[1].split("[\\s.]+");
 			this.tableName = tableName[1];
-		}
-
-		String[] splitAtOrderBy = query.split("order by");
-
-		if (splitAtOrderBy.length > 1) {
-			orderByColumn = splitAtOrderBy[1].trim();
-		}
-
-		splitAtGroupBy = splitAtOrderBy[0].split("group by");
-
-		if (splitAtGroupBy.length > 1) {
-			groupByColumn = splitAtGroupBy[1].trim();
-		}
-
-		splitAtWhere = splitAtGroupBy[0].split("where");
-
-		// sal > 1000 and name = abcd or col = something
-
-		if (splitAtWhere.length > 1) {
-			whereClause = new ArrayList<>();
-			logicalConditions = new ArrayList<>();
-			String whereString = splitAtWhere[1].trim();
-			String[] logicalCond = whereString.split("\\s+");
-			for (String s : logicalCond) {
-				if (s.equals("and")) {
-					logicalConditions.add("and");
-				} else if (s.equals("or")) {
-					logicalConditions.add("or");
-				}
-			}
-			String[] whereClauseElement = whereString.split(" and | or ", 2); // extra spaces are handled by trim
-			while (whereClauseElement.length != 1) {
-				createCriteria(whereClauseElement[0].trim());
-				whereClauseElement = whereClauseElement[1].split(" and | or ", 2);
-			}
-			createCriteria(whereClauseElement[0].trim());
 		}
 
 		return this;
