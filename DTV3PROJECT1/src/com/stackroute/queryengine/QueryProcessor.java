@@ -1,10 +1,13 @@
 package com.stackroute.queryengine;
 
+import java.awt.GradientPaint;
 import java.util.ArrayList;
 import java.util.Map;
 
 import org.omg.CORBA.PRIVATE_MEMBER;
 
+import com.stackroute.queryengine.processors.AggregateProcessor;
+import com.stackroute.queryengine.processors.GroupByProcessor;
 import com.stackroute.queryengine.processors.OrderByProcessor;
 import com.stackroute.queryengine.processors.Processor;
 import com.stackroute.queryengine.processors.SimpleProcessor;
@@ -12,19 +15,21 @@ import com.stackroute.queryengine.processors.SimpleProcessor;
 public class QueryProcessor {
 
 	Map<Integer, ArrayList<String>> dataSet;
-	
+
 	private Processor processor;
 
 	public Map<Integer, ArrayList<String>> processQuery(QueryParameter queryParameter) {
 
-		/*String tableName = queryParameter.getTableName();
-		String groupByColumn = queryParameter.getGroupByColumn();
-		String orderByColumn = queryParameter.getOrderByColumn();
-		int orderByIndexInMap = queryParameter.getOrderByIndexInMap();
-		String[] selectedColumnNames = queryParameter.getSelectColumnNames();
-		ArrayList<Criteria> whereClause = queryParameter.getWhereClause();
-		String[] headers = csvFileReader.fetchHeader(tableName);
-		ArrayList<String> logicalConditions = queryParameter.getlogicalConditions();*/
+		/*
+		 * String tableName = queryParameter.getTableName(); String groupByColumn =
+		 * queryParameter.getGroupByColumn(); String orderByColumn =
+		 * queryParameter.getOrderByColumn(); int orderByIndexInMap =
+		 * queryParameter.getOrderByIndexInMap(); String[] selectedColumnNames =
+		 * queryParameter.getSelectColumnNames(); ArrayList<Criteria> whereClause =
+		 * queryParameter.getWhereClause(); String[] headers =
+		 * csvFileReader.fetchHeader(tableName); ArrayList<String> logicalConditions =
+		 * queryParameter.getlogicalConditions();
+		 */
 
 		switch (queryParameter.getQueryType()) {
 
@@ -35,16 +40,15 @@ public class QueryProcessor {
 			processor = new OrderByProcessor();
 			break;
 		case "GROUP_BY_QUERY":
-
+			processor = new GroupByProcessor();
 			break;
 		case "AGGREGATE_QUERY":
-
+			processor = new AggregateProcessor();
 			break;
-
 		default:
 			break;
 		}
-		
+
 		dataSet = processor.executeQuery(queryParameter);
 		return dataSet;
 	}

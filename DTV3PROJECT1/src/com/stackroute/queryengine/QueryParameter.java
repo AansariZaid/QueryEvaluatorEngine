@@ -190,4 +190,12 @@ public class QueryParameter {
 		this.queryType = queryType;
 	}
 
+	public ArrayList<String> getLogicalConditions() {
+		return logicalConditions;
+	}
+
+	public ArrayList<AggregateFunctions> getAggregateFunctions() {
+		return aggregateFunctions;
+	}
+
 }
